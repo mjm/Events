@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>EventBuilder Structure Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Struct/EventBuilder" class="dashAnchor"></a>
+
+    <a title="EventBuilder Structure Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          Events Docs
+        </a>
+         (100% documented)
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/mjm/Events">
+            <img class="header-icon" src="../img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">Events Reference</a>
+      <img class="carat" src="../img/carat.png" />
+      EventBuilder Structure Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/OSLogEventSink.html">OSLogEventSink</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/EventSink.html">EventSink</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Event.html">Event</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Event/Key.html">– Key</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EventBuilder.html">EventBuilder</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content">
+            <h1>EventBuilder</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">EventBuilder</span></code></pre>
+
+                </div>
+              </div>
+            <p>An EventBuilder is what your app uses to add information to events and send them when they&rsquo;re complete.</p>
+<h2 id='using-the-current-event' class='heading'>Using the current event</h2>
+
+<p><code><a href="../Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code> is an event builder that different parts of your app can use to attach custom data to a currently in-progress
+event. Various parts of your app can add fields to the current event without having to coordinate passing the event around or even
+having to know about each other.</p>
+
+<p>When the work corresponding to an event is complete, be sure to send the current event. When you do, the current event will be
+reset to a blank slate so that the next action can start adding information for the next event.</p>
+<h2 id='attaching-fields-to-all-events' class='heading'>Attaching fields to all events</h2>
+
+<p><code><a href="../Structs/Event.html#/s:6Events5EventV6globalAA0B7BuilderVvpZ">Event.global</a></code> is an event builder that is not meant to be sent. Instead, you can add fields to the global event builder, and those
+fields will be included automatically in all events.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderV5errors5Error_pSgvp"></a>
+                    <a name="//apple_ref/swift/Property/error" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderV5errors5Error_pSgvp">error</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An error that should be logged with the event.</p>
+
+<p>Since needing to log errors is a very common case, you can use this field instead of having to define an event key for errors in your app.
+When encoding the event, the error&rsquo;s <code>localizedDescription</code> will be encoded in the <code>err</code> key of the event.</p>
+
+<p>Generally, for consistency, you should always use this property to log an error, but there may be cases where a single event can generate
+multiple errors because it doesn&rsquo;t stop short in the case of an error. In this situation, it&rsquo;s fine to define custom event keys for each error
+and store both on the event.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">Error</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderV4sinkAcA0B4Sink_p_tcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(sink:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderV4sinkAcA0B4Sink_p_tcfc">init(sink:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Create a new <code>EventBuilder</code>.</p>
+
+<p>Think carefully before constructing an <code>EventBuilder</code> directly. Most of the time, you&rsquo;ll want to use <code><a href="../Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code> to avoid
+having to pass the event around to different parts of your app explicitly. However, if you have background work that may be happening
+concurrently with user actions, you&rsquo;ll want to let the user actions use <code><a href="../Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code> and create a separate <code>EventBuilder</code>
+for the background work to use so that you can log those events separately.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">sink</span><span class="p">:</span> <span class="kt"><a href="../Protocols/EventSink.html">EventSink</a></span> <span class="o">=</span> <span class="kt"><a href="../Structs/Event.html">Event</a></span><span class="o">.</span><span class="n">sink</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>sink</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A different event sink to use than the default that is set at <code><a href="../Structs/Event.html#/s:6Events5EventV4sinkAA0B4Sink_pvpZ">Event.sink</a></code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderVyxSgAA0B0V3KeyOcSERzluip"></a>
+                    <a name="//apple_ref/swift/Method/subscript(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderVyxSgAA0B0V3KeyOcSERzluip">subscript(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get or set custom fields to include app-specific data in your events</p>
+
+<p>This is the primary way to include dynamic data in your events. You should define an <code><a href="../Structs/Event/Key.html">Event.Key</a></code> for each field you want to include,
+then use the subscript to assign data to that field in your app. The value you assign can be anything <code>Encodable</code>, though depending
+on the event sink you use and the encoder it uses, there may be limitations on what values can actually be encoded in the event. For
+example, the <code><a href="../Classes/OSLogEventSink.html">OSLogEventSink</a></code> does not currently support nested keys, so your values need to encode to a flat structure.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">subscript</span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="kt"><a href="../Structs/Event.html">Event</a></span><span class="o">.</span><span class="kt">Key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">T</span><span class="p">?</span> <span class="k">where</span> <span class="kt">T</span> <span class="p">:</span> <span class="kt">Encodable</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>key</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The key of the data in the event.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The encodable value associated with the key in the event.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderVyxycAA0B0V3KeyOcSERzluip"></a>
+                    <a name="//apple_ref/swift/Method/subscript(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderVyxycAA0B0V3KeyOcSERzluip">subscript(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set a custom field to a value that will be evaluated on-demand when the event is sent.</p>
+
+<p>This is very similar to normal field assignment, but instead of providing the value directly, you must provide a closure that returns the value
+you want to be included in the event. When the event is about to be sent, the closure will be called, and the result will be used as the field
+value.</p>
+
+<p>If you reuse the event builder, either by making copies and sending those or by setting closures for fields in <code><a href="../Structs/Event.html#/s:6Events5EventV6globalAA0B7BuilderVvpZ">Event.global</a></code>, the result
+of the closure will not be cached: it will be called each time an event is sent that included that field. This kind of field is useful for including
+dynamic system state in your events that may change at any time.</p>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    <p>Due to the way on-demand fields are stored, it&rsquo;s not possible to get the closure that was originally set for the field back
+out later. Attempting to do so will result in a <code>fatalError()</code>, because Swift requires a getter for all subscripts.</p>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">subscript</span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="kt"><a href="../Structs/Event.html">Event</a></span><span class="o">.</span><span class="kt">Key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">T</span> <span class="k">where</span> <span class="kt">T</span> <span class="p">:</span> <span class="kt">Encodable</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>key</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The key of the data in the event.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A closure that returns the encodable value associated with the key in the event.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderV10startTimeryyAA0B0V3KeyOF"></a>
+                    <a name="//apple_ref/swift/Method/startTimer(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderV10startTimeryyAA0B0V3KeyOF">startTimer(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Starts a timer that will store a duration for a given key.</p>
+
+<p>It can be useful to track durations of specific parts of the work your app does during an event and store those durations as fields in the
+event. This method provides an easy way to do that.</p>
+
+<p>Call <code>startTimer(_:)</code> when the work you want to measure begins, then call <code><a href="../Structs/EventBuilder.html#/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyOF">stopTimer(_:)</a></code> with the same key when it
+completes. When you stop the timer, the duration in milliseconds of the work will be stored in the event under <code>key</code>.</p>
+<div class="aside aside-precondition">
+    <p class="aside-title">Precondition</p>
+    <p>There must not be a timer already started for this key.</p>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">startTimer</span><span class="p">(</span><span class="n">_</span> <span class="nv">key</span><span class="p">:</span> <span class="kt"><a href="../Structs/Event.html">Event</a></span><span class="o">.</span><span class="kt">Key</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>key</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The key in the event where the timer duration will be stored when stopped.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyOF"></a>
+                    <a name="//apple_ref/swift/Method/stopTimer(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyOF">stopTimer(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Stops a timer that was previously started and records the duration in the event.</p>
+
+<p>The duration is stored as the milliseconds that passed between starting the timer and calling this method.</p>
+<div class="aside aside-precondition">
+    <p class="aside-title">Precondition</p>
+    <p>A timer must have been started for this key already.</p>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">stopTimer</span><span class="p">(</span><span class="n">_</span> <span class="nv">key</span><span class="p">:</span> <span class="kt"><a href="../Structs/Event.html">Event</a></span><span class="o">.</span><span class="kt">Key</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>key</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The key used to start the timer and where the duration will be stored on the event.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderV4sendyys12StaticStringVF"></a>
+                    <a name="//apple_ref/swift/Method/send(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderV4sendyys12StaticStringVF">send(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Send the event to its sink using the default level.</p>
+
+<p>See <code><a href="../Structs/EventBuilder.html#/s:6Events12EventBuilderV4sendyySo13os_log_type_ta_s12StaticStringVtF">send(_:_:)</a></code> for more details on sending events.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">send</span><span class="p">(</span><span class="n">_</span> <span class="nv">message</span><span class="p">:</span> <span class="kt">StaticString</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>message</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A message to describe the event.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderV4sendyySo13os_log_type_ta_s12StaticStringVtF"></a>
+                    <a name="//apple_ref/swift/Method/send(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderV4sendyySo13os_log_type_ta_s12StaticStringVtF">send(_:_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Send the event to its sink at a given level.</p>
+
+<p>This creates an <code><a href="../Structs/Event.html">Event</a></code> based on the current fields in this builder and the global builder, and sends it to the event sink.</p>
+
+<p>After sending the event, all fields are cleared from the builder so that it can be reused to send a new event. This is primarily to support
+reusing <code><a href="../Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code> in a natural way. If you need to send an event and also keep using the existing fields for it, you can copy
+the event into a new <code>var</code> and send the copy, and only the copy will be reset. If you find yourself doing this, it may be a sign that
+you are sending too many events and should be collapsing more data into less granular events.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">send</span><span class="p">(</span><span class="n">_</span> <span class="nv">level</span><span class="p">:</span> <span class="kt">OSLogType</span><span class="p">,</span> <span class="n">_</span> <span class="nv">message</span><span class="p">:</span> <span class="kt">StaticString</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>level</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The log level to send this event at. Not all sinks will do something useful with this information.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>message</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A message to describe the event. This message cannot include dynamic data. All dynamic data should be added
+as fields on the event.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2019 <a class="link" href="https://www.mattmoriarity.com/" target="_blank" rel="external">Matt Moriarity</a>. All rights reserved. (Last updated: 2019-10-20)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>
