@@ -73,7 +73,7 @@
                 <a class="nav-group-task-link" href="../Structs/Event.html">Event</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs/Event/Key.html">– Key</a>
+                <a class="nav-group-task-link" href="../Structs/Event.html#/s:6Events5EventV3KeyV">– Key</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/EventBuilder.html">EventBuilder</a>
@@ -202,9 +202,9 @@ for the background work to use so that you can log those events separately.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:6Events12EventBuilderVyxSgAA0B0V3KeyOcSERzluip"></a>
+                    <a name="/s:6Events12EventBuilderVyxSgAA0B0V3KeyVcSERzluip"></a>
                     <a name="//apple_ref/swift/Method/subscript(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:6Events12EventBuilderVyxSgAA0B0V3KeyOcSERzluip">subscript(_:)</a>
+                    <a class="token" href="#/s:6Events12EventBuilderVyxSgAA0B0V3KeyVcSERzluip">subscript(_:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -214,7 +214,7 @@ for the background work to use so that you can log those events separately.</p>
                       <div class="abstract">
                         <p>Get or set custom fields to include app-specific data in your events</p>
 
-<p>This is the primary way to include dynamic data in your events. You should define an <code><a href="../Structs/Event/Key.html">Event.Key</a></code> for each field you want to include,
+<p>This is the primary way to include dynamic data in your events. You should define an <code><a href="../Structs/Event.html#/s:6Events5EventV3KeyV">Event.Key</a></code> for each field you want to include,
 then use the subscript to assign data to that field in your app. The value you assign can be anything <code>Encodable</code>, though depending
 on the event sink you use and the encoder it uses, there may be limitations on what values can actually be encoded in the event. For
 example, the <code><a href="../Classes/OSLogEventSink.html">OSLogEventSink</a></code> does not currently support nested keys, so your values need to encode to a flat structure.</p>
@@ -257,9 +257,9 @@ example, the <code><a href="../Classes/OSLogEventSink.html">OSLogEventSink</a></
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:6Events12EventBuilderVyxycAA0B0V3KeyOcSERzluip"></a>
+                    <a name="/s:6Events12EventBuilderVyxycAA0B0V3KeyVcSERzluip"></a>
                     <a name="//apple_ref/swift/Method/subscript(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:6Events12EventBuilderVyxycAA0B0V3KeyOcSERzluip">subscript(_:)</a>
+                    <a class="token" href="#/s:6Events12EventBuilderVyxycAA0B0V3KeyVcSERzluip">subscript(_:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -321,9 +321,9 @@ out later. Attempting to do so will result in a <code>fatalError()</code>, becau
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:6Events12EventBuilderV10startTimeryyAA0B0V3KeyOF"></a>
+                    <a name="/s:6Events12EventBuilderV10startTimeryyAA0B0V3KeyVF"></a>
                     <a name="//apple_ref/swift/Method/startTimer(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:6Events12EventBuilderV10startTimeryyAA0B0V3KeyOF">startTimer(_:)</a>
+                    <a class="token" href="#/s:6Events12EventBuilderV10startTimeryyAA0B0V3KeyVF">startTimer(_:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -336,7 +336,7 @@ out later. Attempting to do so will result in a <code>fatalError()</code>, becau
 <p>It can be useful to track durations of specific parts of the work your app does during an event and store those durations as fields in the
 event. This method provides an easy way to do that.</p>
 
-<p>Call <code>startTimer(_:)</code> when the work you want to measure begins, then call <code><a href="../Structs/EventBuilder.html#/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyOF">stopTimer(_:)</a></code> with the same key when it
+<p>Call <code>startTimer(_:)</code> when the work you want to measure begins, then call <code><a href="../Structs/EventBuilder.html#/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyVF">stopTimer(_:)</a></code> with the same key when it
 completes. When you stop the timer, the duration in milliseconds of the work will be stored in the event under <code>key</code>.</p>
 <div class="aside aside-precondition">
     <p class="aside-title">Precondition</p>
@@ -378,9 +378,9 @@ completes. When you stop the timer, the duration in milliseconds of the work wil
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyOF"></a>
+                    <a name="/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyVF"></a>
                     <a name="//apple_ref/swift/Method/stopTimer(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyOF">stopTimer(_:)</a>
+                    <a class="token" href="#/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyVF">stopTimer(_:)</a>
                     </code>
                   </div>
                   <div class="height-container">

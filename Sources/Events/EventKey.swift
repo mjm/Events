@@ -17,36 +17,29 @@ extension Event {
     /// ```
     ///
     /// The string literal you assign for the key will be the key used for the field when encoding the event.
-    public enum Key: Hashable, CodingKey, ExpressibleByStringLiteral {
+    public struct Key: Hashable, CodingKey, ExpressibleByStringLiteral {
+        /// :nodoc:
+        public let stringValue: String
+        
         /// Key for storing the timestamp of the event.
         ///
         /// This isn't currently used because `os_log` messages already include the current timestamp.
         ///
         /// - ToDo: This should be used and included when encoding events, and we should find a way to ignore it in
         ///   in situations where we don't want to include the field.
-        case time
+        static let time: Event.Key = "time"
         /// Key for storing the error that occurred on the event.
         ///
         /// You shouldn't need to use this key directly. Instead, use the `EventBuilder.error` property to set the error for an event.
         ///
         /// - Note: This key encodes as `"err"`.
-        case error
+        static let error: Event.Key = "err"
         /// Key for storing the message that was passed when sending the event.
         ///
         /// You shouldn't need to use this key directly. Instead, include your message when calling `EventBuilder.send(_:)`.
         ///
         /// - Note: This key encodes as `"msg"`.
-        case message
-        /// An app-specific custom key that encodes to an arbitrary string.
-        ///
-        /// You should avoid using this case directly, and instead define your custom keys as constants on `Event.Key`:
-        ///
-        /// ```
-        /// extension Event.Key {
-        ///     static let florbCount: Event.Key = "florb_count"
-        /// }
-        /// ```
-        case custom(String)
+        static let message: Event.Key = "msg"
         
         /// :nodoc:
         public init?(intValue: Int) {
@@ -55,30 +48,15 @@ extension Event {
         
         /// :nodoc:
         public init?(stringValue: String) {
-            switch stringValue {
-            case "time": self = .time
-            case "err": self = .error
-            case "msg": self = .message
-            default: self = .custom(stringValue)
-            }
+            self.stringValue = stringValue
         }
         
         /// :nodoc:
         public init(stringLiteral value: String) {
-            self = .custom(value)
+            stringValue = value
         }
         
         /// :nodoc:
         public var intValue: Int? { nil }
-        
-        /// :nodoc:
-        public var stringValue: String {
-            switch self {
-            case .time: return "time"
-            case .error: return "err"
-            case .message: return "msg"
-            case let .custom(key): return key
-            }
-        }
     }
 }
