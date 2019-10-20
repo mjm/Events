@@ -2,6 +2,20 @@ import Foundation
 import os
 
 /// An EventBuilder is what your app uses to add information to events and send them when they're complete.
+///
+/// ## Using the current event
+///
+/// `Event.current` is an event builder that different parts of your app can use to attach custom data to a currently in-progress
+/// event. Various parts of your app can add fields to the current event without having to coordinate passing the event around or even
+/// having to know about each other.
+///
+/// When the work corresponding to an event is complete, be sure to send the current event. When you do, the current event will be
+/// reset to a blank slate so that the next action can start adding information for the next event.
+///
+/// ## Attaching fields to all events
+///
+/// `Event.global` is an event builder that is not meant to be sent. Instead, you can add fields to the global event builder, and those
+/// fields will be included automatically in all events.
 public struct EventBuilder {
     /// An error that should be logged with the event.
     ///
@@ -79,6 +93,18 @@ public struct EventBuilder {
         }
     }
     
+    /// Starts a timer that will store a duration for a given key.
+    ///
+    /// It can be useful to track durations of specific parts of the work your app does during an event and store those durations as fields in the
+    /// event. This method provides an easy way to do that.
+    ///
+    /// Call `startTimer(_:)` when the work you want to measure begins, then call `stopTimer(_:)` with the same key when it
+    /// completes. When you stop the timer, the duration in milliseconds of the work will be stored in the event under `key`.
+    ///
+    /// - Parameters:
+    ///    - key: The key in the event where the timer duration will be stored when stopped.
+    ///
+    /// - Precondition: There must not be a timer already started for this key.
     public mutating func startTimer(_ key: Event.Key) {
         guard timers[key] == nil else {
             preconditionFailure("Attempted to start timer for key \(key), but there's already a timer going for that key.")
@@ -87,6 +113,14 @@ public struct EventBuilder {
         timers[key] = Date()
     }
     
+    /// Stops a timer that was previously started and records the duration in the event.
+    ///
+    /// The duration is stored as the milliseconds that passed between starting the timer and calling this method.
+    ///
+    /// - Parameters:
+    ///    - key: The key used to start the timer and where the duration will be stored on the event.
+    ///
+    /// - Precondition: A timer must have been started for this key already.
     public mutating func stopTimer(_ key: Event.Key) {
         let endTime = Date()
         
