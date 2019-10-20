@@ -19,7 +19,7 @@ class EventBuilderTests: XCTestCase {
         let event = b.makeEvent(message: "test message", timestamp: now)
         
         XCTAssertEqual(event.timestamp, now)
-        XCTAssertEqual(event.message, "test message")
+        XCTAssertEqual(event.message.asString, "test message")
         XCTAssertNil(event.error)
     }
     
@@ -31,7 +31,7 @@ class EventBuilderTests: XCTestCase {
         let event = b.makeEvent(message: "test message", timestamp: now)
         
         XCTAssertEqual(event.timestamp, now)
-        XCTAssertEqual(event.message, "test message")
+        XCTAssertEqual(event.message.asString, "test message")
         XCTAssertNil(event.error)
         XCTAssertEqual(event.fields[.foo]?.value as? String, "a string test")
         XCTAssertEqual(event.fields[.bar]?.value as? Int, 123)
