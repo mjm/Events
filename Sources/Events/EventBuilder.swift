@@ -29,7 +29,7 @@ public struct EventBuilder {
     
     var fields: [Event.Key: AnyEncodable] = [:]
     var lazyFields: [Event.Key: () -> AnyEncodable] = [:]
-    private var timers: [Event.Key: Date] = [:]
+    private var timers: [Event.Key: UInt64] = [:]
     
     private let sink: EventSink
     
@@ -110,7 +110,7 @@ public struct EventBuilder {
             preconditionFailure("Attempted to start timer for key \(key), but there's already a timer going for that key.")
         }
         
-        timers[key] = Date()
+        timers[key] = mach_absolute_time()
     }
     
     /// Stops a timer that was previously started and records the duration in the event.
@@ -122,14 +122,14 @@ public struct EventBuilder {
     ///
     /// - Precondition: A timer must have been started for this key already.
     public mutating func stopTimer(_ key: Event.Key) {
-        let endTime = Date()
+        let endTime = mach_absolute_time()
         
         guard let startTime = timers.removeValue(forKey: key) else {
             preconditionFailure("Attempted to stop timer for key \(key), but it was never started.")
         }
         
-        let duration = endTime.timeIntervalSinceReferenceDate - startTime.timeIntervalSinceReferenceDate
-        self[key] = duration * 1000.0 // store durations as milliseconds
+        let nanos = (endTime - startTime) * UInt64(timeBase.numer) / UInt64(timeBase.denom)
+        self[key] = Double(nanos) / Double(NSEC_PER_MSEC) // store durations as milliseconds
     }
     
     /// Send the event to its sink using the default level.
@@ -180,3 +180,9 @@ public struct EventBuilder {
         fields.merging(lazyFields.mapValues { $0() }) { $1 }
     }
 }
+
+private let timeBase: mach_timebase_info = {
+    var timeBaseInfo = mach_timebase_info()
+    mach_timebase_info(&timeBaseInfo)
+    return timeBaseInfo
+}()
