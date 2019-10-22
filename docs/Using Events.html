@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Using Events  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Section/Using Events" class="dashAnchor"></a>
+
+    <a title="Using Events  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          Events Docs
+        </a>
+         (100% documented)
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/mjm/Events">
+            <img class="header-icon" src="img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">Events Reference</a>
+      <img class="carat" src="img/carat.png" />
+      Using Events  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Using%20Events.html">Using Events</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EventBuilder.html">EventBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Event.html">Event</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Event.html#/s:6Events5EventV3KeyV">– Key</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Destinations.html">Destinations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/EventSink.html">EventSink</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/OSLogEventSink.html">OSLogEventSink</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content">
+            <h1>Using Events</h1>
+            <h2 id='what-is-an-event' class='heading'>What is an event?</h2>
+
+<p>Events are different than typical application logging.
+Logging usually means emitting a message whenever your app does something interesting.
+Any complex logic will need to log several messages to indicate progress and include more useful data about different parts of the process.
+These log messages are easy to write, but when you need to debug a problem in the logic, the information you need to understand what happens is scattered.
+You&rsquo;ll need to relate many independent log messages to get the complete picture of what happened.</p>
+
+<p>Events solve this problem by collecting all of the information about a particular action into one place.
+At the end of the day, an event is basically just a dictionary: a collection of key-value pairs.
+Instead of logging different messages throughout our code, we can keep adding information to an event.
+When the action is complete, we can send a single message with all the information we&rsquo;ve accumulated.
+Later, when we&rsquo;re diagnosing a problem, we will only need to look in one place to have everything we need to understand what happened.</p>
+
+<p>This may not sound like a big difference, but embracing an event model for logging can be incredibly powerful. This is especially true if you can get these events into a queryable data store.</p>
+
+<p>The good folks at <a href="https://www.honeycomb.io/">Honeycomb</a> deserve a lot of credit for promoting this model for understanding systems. They&rsquo;ve <a href="https://www.honeycomb.io/events-blog/">written a great deal</a> about events vs. logs, including a great post about <a href="https://www.honeycomb.io/blog/how-are-structured-logs-different-from-events/">the difference between structured logs and events</a>.</p>
+<h2 id='creating-an-event' class='heading'>Creating an event</h2>
+
+<p>The Events package provides an <code><a href="Structs/EventBuilder.html">EventBuilder</a></code> type that you can use to construct your events, add data to them, and then send them to their destination.</p>
+
+<p>You won&rsquo;t usually need to create an <code><a href="Structs/EventBuilder.html">EventBuilder</a></code>. Events provides a shared one at <code><a href="Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code> that you can use from many different parts of your application. This event builder is global to the entire application. This works because most of the time, an app isn&rsquo;t doing multiple high-level units of work at a time.</p>
+
+<p>Sometimes you&rsquo;ll want to emit an event for background work that could happen concurrently with the <q>current</q> event. In these situations, you can create an <code><a href="Structs/EventBuilder.html">EventBuilder</a></code> locally. You&rsquo;ll need to pass the event explicitly to other functions that need to add data to it, whereas <code><a href="Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code> is globally available, but otherwise it works the same.</p>
+<h2 id='adding-information-to-an-event' class='heading'>Adding information to an event</h2>
+
+<p>To add data to an event, start by defining the keys that you&rsquo;ll be storing on your events:</p>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">Event</span><span class="o">.</span><span class="kt">Key</span> <span class="p">{</span>
+    <span class="kd">static</span> <span class="k">let</span> <span class="nv">listName</span><span class="p">:</span> <span class="kt">Event</span><span class="o">.</span><span class="kt">Key</span> <span class="o">=</span> <span class="s">"list_name"</span>
+    <span class="kd">static</span> <span class="k">let</span> <span class="nv">itemCount</span><span class="p">:</span> <span class="kt">Event</span><span class="o">.</span><span class="kt">Key</span> <span class="o">=</span> <span class="s">"item_count"</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>These keys are simple wrappers for strings, but explicitly defining them as constants helps you use them consistently in different parts of your app.</p>
+
+<p>With your keys defined, you can use them in your code to add data to the current event (or another event builder):</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">fetchList</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">{</span>
+    <span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="o">.</span><span class="n">listName</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">let</span> <span class="nv">list</span> <span class="o">=</span> <span class="kt">List</span><span class="o">.</span><span class="nf">findByName</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="o">.</span><span class="n">itemCount</span><span class="p">]</span> <span class="o">=</span> <span class="n">list</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">count</span>
+
+    <span class="k">return</span> <span class="n">list</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The values you set in the event can be any type that is <code>Encodable</code>.</p>
+<h3 id='using-timers-to-track-durations' class='heading'>Using timers to track durations</h3>
+
+<p>For events that are made up of multiple steps, it can be useful to track the duration of each step as a field on the event. <code><a href="Structs/EventBuilder.html#/s:6Events12EventBuilderV10startTimeryyAA0B0V3KeyVF">EventBuilder.startTimer(_:)</a></code> and <code><a href="Structs/EventBuilder.html#/s:6Events12EventBuilderV9stopTimeryyAA0B0V3KeyVF">EventBuilder.stopTimer(_:)</a></code> make this easy to do without filling your code with date math.</p>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">Event</span><span class="o">.</span><span class="kt">Key</span> <span class="p">{</span>
+    <span class="kd">static</span> <span class="k">let</span> <span class="nv">fetchUserTime</span><span class="p">:</span> <span class="kt">Event</span><span class="o">.</span><span class="kt">Key</span> <span class="o">=</span> <span class="s">"fetch_user_ms"</span>
+    <span class="kd">static</span> <span class="k">let</span> <span class="nv">fetchListsTime</span><span class="p">:</span> <span class="kt">Event</span><span class="o">.</span><span class="kt">Key</span> <span class="o">=</span> <span class="s">"fetch_lists_ms"</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">fetchUserAndLists</span><span class="p">(</span><span class="nv">completion</span><span class="p">:</span> <span class="p">((</span><span class="kt">User</span><span class="p">?,</span> <span class="p">[</span><span class="kt">List</span><span class="p">]?,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">))</span> <span class="p">{</span>
+    <span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="nf">startTimer</span><span class="p">(</span><span class="o">.</span><span class="n">fetchUserTime</span><span class="p">)</span>
+    <span class="kt">Request</span><span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="s">"/user"</span><span class="p">)</span> <span class="p">{</span> <span class="n">user</span><span class="p">,</span> <span class="n">error</span> <span class="k">in</span>
+        <span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="nf">stopTimer</span><span class="p">(</span><span class="o">.</span><span class="n">fetchUserTime</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">error</span> <span class="o">=</span> <span class="n">error</span> <span class="p">{</span>
+            <span class="nf">completion</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="nf">startTimer</span><span class="p">(</span><span class="o">.</span><span class="n">fetchListsTime</span><span class="p">)</span>
+            <span class="kt">Request</span><span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="s">"/users/</span><span class="se">\(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="se">)</span><span class="s">/lists"</span><span class="p">)</span> <span class="p">{</span> <span class="n">lists</span><span class="p">,</span> <span class="n">error</span> <span class="k">in</span>
+                <span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="nf">stopTimer</span><span class="p">(</span><span class="o">.</span><span class="n">fetchListsTime</span><span class="p">)</span>
+
+                <span class="nf">completion</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">lists</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>You pass an event key to both <code>startTimer</code> and <code>stopTimer</code>. When you call <code>stopTimer</code>, the key you provide will be set to the time since the call to <code>startTimer</code>, in milliseconds.</p>
+<h3 id='handling-errors' class='heading'>Handling errors</h3>
+
+<p>It&rsquo;s such a common need to save information about errors that occur in your app that there&rsquo;s a built-in <code>error</code> property for it on <code>ErrorBuilder</code>s.</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">fetchUser</span><span class="p">(</span><span class="nv">completion</span><span class="p">:</span> <span class="p">((</span><span class="kt">User</span><span class="p">?,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">))</span> <span class="p">{</span>
+    <span class="kt">Request</span><span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="s">"/user"</span><span class="p">)</span> <span class="p">{</span> <span class="n">user</span><span class="p">,</span> <span class="n">error</span> <span class="k">in</span>
+        <span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">error</span>
+        <span class="nf">completion</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Using this property serves two purposes:</p>
+
+<ul>
+<li>It ensures a consistent key (<code>&quot;err&quot;</code>) for the errors your app includes in its events.</li>
+<li><code>Error</code> is not <code>Encodable</code>, so you can&rsquo;t set one directly as a field on an event. When you set the <code>error</code> property, the <code>localizedDescription</code> string from the error gets included on the <code>&quot;err&quot;</code> key of the event.</li>
+</ul>
+<h2 id='sending-events' class='heading'>Sending events</h2>
+
+<p>When your app completes the work that makes up an event, you need to send it. Sending an event means you&rsquo;re done adding information to it, and it&rsquo;s ready to be sent to its destination. You send an event by calling <code><a href="Structs/EventBuilder.html#/s:6Events12EventBuilderV4sendyys12StaticStringVF">EventBuilder.send(_:)</a></code>.</p>
+<pre class="highlight swift"><code><span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">deleteItem</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Item.delete(_:) adds data to the current event</span>
+    <span class="n">selectedItem</span><span class="o">.</span><span class="n">delete</span> <span class="p">{</span> <span class="n">error</span> <span class="k">in</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">error</span> <span class="o">=</span> <span class="n">error</span> <span class="p">{</span>
+            <span class="k">self</span><span class="o">.</span><span class="nf">presentError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="nf">send</span><span class="p">(</span><span class="s">"deleted item"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>When you send an event, you pass a message string that describes the event, and that gets included as the <code>&quot;msg&quot;</code> field of the event. This is kind of like a log message, but there&rsquo;s an important limitation: it cannot include any dynamic data. <code><a href="Structs/EventBuilder.html#/s:6Events12EventBuilderV4sendyys12StaticStringVF">EventBuilder.send(_:)</a></code> takes a <code>StaticString</code> for the message, so trying to use interpolation or other ways of building a string with dynamic content will fail to compile. This shouldn&rsquo;t be an issue, though: dynamic data for your events should be in the fields. The message of a particular event should always be the same (this also makes it easier to correlate similar events).</p>
+
+<p>Sending an event causes the event builder to freeze its contents into an <code><a href="Structs/Event.html">Event</a></code> structure. The <code><a href="Structs/Event.html">Event</a></code> is sent to an <code><a href="Protocols/EventSink.html">EventSink</a></code> which is responsible for logging the event to a particular destination. See <a href="Destinations.html">Destinations</a> for more about event sinks.</p>
+
+<p>Finally, once you send an event, the event builder you used is reset so that all of its fields are cleared out. This means that if you were using <code><a href="Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code>, it&rsquo;s already ready to go the next time you start doing work that needs to be recorded in an event.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderV"></a>
+                    <a name="//apple_ref/swift/Struct/EventBuilder" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderV">EventBuilder</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An EventBuilder is what your app uses to add information to events and send them when they&rsquo;re complete.</p>
+<h2 id='using-the-current-event' class='heading'>Using the current event</h2>
+
+<p><code><a href="Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code> is an event builder that different parts of your app can use to attach custom data to a currently in-progress
+event. Various parts of your app can add fields to the current event without having to coordinate passing the event around or even
+having to know about each other.</p>
+
+<p>When the work corresponding to an event is complete, be sure to send the current event. When you do, the current event will be
+reset to a blank slate so that the next action can start adding information for the next event.</p>
+<h2 id='attaching-fields-to-all-events' class='heading'>Attaching fields to all events</h2>
+
+<p><code><a href="Structs/Event.html#/s:6Events5EventV6globalAA0B7BuilderVvpZ">Event.global</a></code> is an event builder that is not meant to be sent. Instead, you can add fields to the global event builder, and those
+fields will be included automatically in all events.</p>
+
+                        <a href="Structs/EventBuilder.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">EventBuilder</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events5EventV"></a>
+                    <a name="//apple_ref/swift/Struct/Event" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events5EventV">Event</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An Event structure holds the information for a complete loggable event in your application.</p>
+
+<p>You are not expected to construct an <code>Event</code> yourself. Instead, use an <code><a href="Structs/EventBuilder.html">EventBuilder</a></code> to set up your events. When you
+tell the event builder to send the event, it creates an <code>Event</code> for you and sends it to the event sink.</p>
+
+<p>The only way to access the data in an <code>Event</code> is by using an encoder to encode it.</p>
+
+<p><code>Event</code> also includes some static properties that serve a few purposes:</p>
+
+<ul>
+<li>Provide some special <code><a href="Structs/EventBuilder.html">EventBuilder</a></code>s: <code>current</code> and <code>global</code>.</li>
+<li>Allow configuring the behavior of events.</li>
+</ul>
+
+                        <a href="Structs/Event.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Event</span> <span class="p">:</span> <span class="kt">Encodable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2019 <a class="link" href="https://www.mattmoriarity.com/" target="_blank" rel="external">Matt Moriarity</a>. All rights reserved. (Last updated: 2019-10-21)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>

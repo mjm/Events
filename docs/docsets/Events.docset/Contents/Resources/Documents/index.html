@@ -50,7 +50,7 @@
       <nav class="navigation">
         <ul class="nav-groups">
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="Creating%20Events.html">Creating Events</a>
+            <a class="nav-group-name-link" href="Using%20Events.html">Using Events</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/EventBuilder.html">EventBuilder</a>
@@ -84,6 +84,23 @@
             <h1 id='events' class='heading'>Events</h1>
 
 <p>Events is a package for logging high-cardinality events in your Mac or iOS app.</p>
+<h2 id='installation' class='heading'>Installation</h2>
+
+<p>Events can be installed using SwiftPM. If you&rsquo;re using it from another Swift package, add this snippet to the <code>dependencies</code> in your <code>Package.swift</code>:</p>
+<pre class="highlight swift"><code><span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/mjm/Events"</span><span class="p">,</span> <span class="o">.</span><span class="nf">branch</span><span class="p">(</span><span class="s">"master"</span><span class="p">))</span>
+</code></pre>
+
+<p>You can also use Events from your macOS or iOS app using Xcode 11&rsquo;s SwiftPM support.</p>
+
+<ol>
+<li>Click on your project in Xcode&rsquo;s Project navigator.</li>
+<li>Select the project in the sidebar of the editor.</li>
+<li>Hit the + button on the Swift Packages tab.</li>
+<li>Enter <code>https://github.com/mjm/Events</code> for the package repository URL.</li>
+<li>Choose <q>Branch</q> and use <q>master</q> as the branch.</li>
+<li>Be sure the Events library is added to the target for your app.</li>
+<li>Choose <q>Finish.</q></li>
+</ol>
 
           </div>
         </section>
