@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Creating Events  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Section/Creating Events" class="dashAnchor"></a>
+
+    <a title="Creating Events  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          Events Docs
+        </a>
+         (100% documented)
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/mjm/Events">
+            <img class="header-icon" src="img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">Events Reference</a>
+      <img class="carat" src="img/carat.png" />
+      Creating Events  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Creating%20Events.html">Creating Events</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EventBuilder.html">EventBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Event.html">Event</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Event.html#/s:6Events5EventV3KeyV">– Key</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Destinations.html">Destinations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/EventSink.html">EventSink</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/OSLogEventSink.html">OSLogEventSink</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content">
+            <h1>Creating Events</h1>
+            
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events12EventBuilderV"></a>
+                    <a name="//apple_ref/swift/Struct/EventBuilder" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events12EventBuilderV">EventBuilder</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An EventBuilder is what your app uses to add information to events and send them when they&rsquo;re complete.</p>
+<h2 id='using-the-current-event' class='heading'>Using the current event</h2>
+
+<p><code><a href="Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code> is an event builder that different parts of your app can use to attach custom data to a currently in-progress
+event. Various parts of your app can add fields to the current event without having to coordinate passing the event around or even
+having to know about each other.</p>
+
+<p>When the work corresponding to an event is complete, be sure to send the current event. When you do, the current event will be
+reset to a blank slate so that the next action can start adding information for the next event.</p>
+<h2 id='attaching-fields-to-all-events' class='heading'>Attaching fields to all events</h2>
+
+<p><code><a href="Structs/Event.html#/s:6Events5EventV6globalAA0B7BuilderVvpZ">Event.global</a></code> is an event builder that is not meant to be sent. Instead, you can add fields to the global event builder, and those
+fields will be included automatically in all events.</p>
+
+                        <a href="Structs/EventBuilder.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">EventBuilder</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:6Events5EventV"></a>
+                    <a name="//apple_ref/swift/Struct/Event" class="dashAnchor"></a>
+                    <a class="token" href="#/s:6Events5EventV">Event</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An Event structure holds the information for a complete loggable event in your application.</p>
+
+<p>You are not expected to construct an <code>Event</code> yourself. Instead, use an <code><a href="Structs/EventBuilder.html">EventBuilder</a></code> to set up your events. When you
+tell the event builder to send the event, it creates an <code>Event</code> for you and sends it to the event sink.</p>
+
+<p>The only way to access the data in an <code>Event</code> is by using an encoder to encode it.</p>
+
+<p><code>Event</code> also includes some static properties that serve a few purposes:</p>
+
+<ul>
+<li>Provide some special <code><a href="Structs/EventBuilder.html">EventBuilder</a></code>s: <code>current</code> and <code>global</code>.</li>
+<li>Allow configuring the behavior of events.</li>
+</ul>
+
+                        <a href="Structs/Event.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Event</span> <span class="p">:</span> <span class="kt">Encodable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2019 <a class="link" href="https://www.mattmoriarity.com/" target="_blank" rel="external">Matt Moriarity</a>. All rights reserved. (Last updated: 2019-10-21)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>
