@@ -82,7 +82,42 @@
         <section class="section">
           <div class="section-content">
             <h1>Destinations</h1>
-            
+            <p><em>Where do events go when they <del>die</del> are sent?</em></p>
+
+<p>Your events aren&rsquo;t very useful if they don&rsquo;t go somewhere for you to look over later.
+Taking an event and sending it to its destination is the job of an <code><a href="Protocols/EventSink.html">EventSink</a></code>.
+Events currently provides one default event sink, but it also exposes the protocol so that you can define your own if you need to.</p>
+<h2 id='logging-events-to-code-os_log-code' class='heading'>Logging events to <code>os_log</code></h2>
+
+<p>By default, when you send an event, it will be logged to Apple&rsquo;s unified logging system using <code>os_log</code>.</p>
+<pre class="highlight swift"><code><span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="s">"list_name"</span><span class="p">]</span> <span class="o">=</span> <span class="s">"My Fancy List"</span>
+<span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="s">"item_count"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="kt">Event</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="nf">send</span><span class="p">(</span><span class="s">"fetched list"</span><span class="p">)</span>
+</code></pre>
+
+<p>When the above code is run, the following message will be logged to the Console:</p>
+<pre class="highlight plaintext"><code>msg="fetched list" item_count=8 list_name="My Fancy List"
+</code></pre>
+
+<p>Events are logged in the <a href="https://brandur.org/logfmt">logfmt</a> format, as it&rsquo;s a good compromise between human- and machine-readability. After the <code>err</code> and <code>msg</code> keys, the rest of your app-specific fields are output in alphabetical order of key to keep the order deterministic and make fields easy to find.</p>
+
+<p>You can customize the logging subsystem and category used to log your events by overriding <code><a href="Structs/Event.html#/s:6Events5EventV4sinkAA0B4Sink_pvpZ">Event.sink</a></code> with your own instance of <code><a href="Classes/OSLogEventSink.html">OSLogEventSink</a></code>:</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nv">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">UIApplication</span><span class="o">.</span><span class="kt">LaunchOptionsKey</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span> <span class="p">{</span>
+    <span class="kt">Event</span><span class="o">.</span><span class="n">sink</span> <span class="o">=</span> <span class="kt">OSLogEventSink</span><span class="p">(</span><span class="nv">subsystem</span><span class="p">:</span> <span class="s">"com.example.MyListApp"</span><span class="p">,</span>
+                                <span class="nv">category</span><span class="p">:</span> <span class="s">"events"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Doing this is highly recommended, as it can make it easier to filter logging to just your events.</p>
+
+<p><code><a href="Structs/Event.html#/s:6Events5EventV4sinkAA0B4Sink_pvpZ">Event.sink</a></code> controls the default event sink that is assigned to new <code><a href="Structs/EventBuilder.html">EventBuilder</a></code>s. If you want to override it, be sure to set it before your first use of <code><a href="Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code>.</p>
+<h2 id='creating-a-custom-event-sink' class='heading'>Creating a custom event sink</h2>
+
+<p>If you don&rsquo;t want to send your events to the unified logging system, you can create a type that implements <code><a href="Protocols/EventSink.html">EventSink</a></code> and send your events anywhere you want.</p>
+
+<p>An <code><a href="Structs/Event.html">Event</a></code> doesn&rsquo;t directly expose the data in its fields. Instead, events are designed to be encoded using Swift&rsquo;s <code>Encodable</code> protocol.</p>
+
           </div>
         </section>
 
@@ -175,7 +210,7 @@ default logging system for Apple&rsquo;s platforms.
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2019 <a class="link" href="https://www.mattmoriarity.com/" target="_blank" rel="external">Matt Moriarity</a>. All rights reserved. (Last updated: 2019-10-21)</p>
+      <p>&copy; 2019 <a class="link" href="https://www.mattmoriarity.com/" target="_blank" rel="external">Matt Moriarity</a>. All rights reserved. (Last updated: 2019-10-22)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>

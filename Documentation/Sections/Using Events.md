@@ -105,6 +105,33 @@ Using this property serves two purposes:
 * It ensures a consistent key (`"err"`) for the errors your app includes in its events.
 * `Error` is not `Encodable`, so you can't set one directly as a field on an event. When you set the `error` property, the `localizedDescription` string from the error gets included on the `"err"` key of the event.
 
+If you have an event that can produce multiple errors (it doesn't stop after the first error encountered), it's completely valid to define more specific error keys and store the `localizedDescription` yourself.
+
+```swift
+extension Event.Key {
+    static let thingError: Error.Key = "thing_err"
+    static let otherThingError: Error.Key = "other_thing_err"
+}
+
+func act() {
+    do {
+        try doThing()
+    } catch {
+        Event.current[.thingError] = error.localizedDescription
+    }
+
+    do {
+        try doOtherThing()
+    } catch {
+        Event.current[.otherThingError] = error.localizedDescription
+    }
+}
+```
+
+Doing this means you don't have to choose which error to keep in the case that both things fail.
+
+
+
 ## Sending events
 
 When your app completes the work that makes up an event, you need to send it. Sending an event means you're done adding information to it, and it's ready to be sent to its destination. You send an event by calling `EventBuilder.send(_:)`.
