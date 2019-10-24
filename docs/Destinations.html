@@ -109,14 +109,47 @@ Events currently provides one default event sink, but it also exposes the protoc
 <span class="p">}</span>
 </code></pre>
 
-<p>Doing this is highly recommended, as it can make it easier to filter logging to just your events.</p>
+<p>Doing this is highly recommended, as it makes it much easier to filter logging to just your events.</p>
 
 <p><code><a href="Structs/Event.html#/s:6Events5EventV4sinkAA0B4Sink_pvpZ">Event.sink</a></code> controls the default event sink that is assigned to new <code><a href="Structs/EventBuilder.html">EventBuilder</a></code>s. If you want to override it, be sure to set it before your first use of <code><a href="Structs/Event.html#/s:6Events5EventV7currentAA0B7BuilderVvpZ">Event.current</a></code>.</p>
 <h2 id='creating-a-custom-event-sink' class='heading'>Creating a custom event sink</h2>
 
 <p>If you don&rsquo;t want to send your events to the unified logging system, you can create a type that implements <code><a href="Protocols/EventSink.html">EventSink</a></code> and send your events anywhere you want.</p>
 
-<p>An <code><a href="Structs/Event.html">Event</a></code> doesn&rsquo;t directly expose the data in its fields. Instead, events are designed to be encoded using Swift&rsquo;s <code>Encodable</code> protocol.</p>
+<p>An <code><a href="Structs/Event.html">Event</a></code> doesn&rsquo;t directly expose the data in its fields. Instead, events are designed to be encoded using Swift&rsquo;s <code>Encodable</code> protocol. This means that your event sink doesn&rsquo;t need to worry about how events are represented or how fields are stored. It can just let an encoder take care of serializing them and send that data where it needs to go.</p>
+
+<p>Hypothetically, if we wanted to make an event sink that saved each event as JSON in a row in a SQL database, that might look something like this:</p>
+<pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">DatabaseEventSink</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">dbConnection</span><span class="p">:</span> <span class="kt">DBConnection</span>
+    <span class="k">let</span> <span class="nv">encoder</span> <span class="o">=</span> <span class="kt">JSONEncoder</span><span class="p">()</span>
+
+    <span class="nf">init</span><span class="p">(</span><span class="nv">dbConnection</span><span class="p">:</span> <span class="kt">DBConnection</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">self</span><span class="o">.</span><span class="n">dbConnection</span> <span class="o">=</span> <span class="n">dbConnection</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">send</span><span class="p">(</span><span class="nv">event</span><span class="p">:</span> <span class="kt">Event</span><span class="p">,</span> <span class="nv">level</span><span class="p">:</span> <span class="kt">OSLogType</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">do</span> <span class="p">{</span>
+            <span class="k">let</span> <span class="nv">jsonData</span> <span class="o">=</span> <span class="k">try</span> <span class="n">encoder</span><span class="o">.</span><span class="nf">encode</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">try</span> <span class="n">dbConnection</span><span class="o">.</span><span class="nf">execute</span><span class="p">(</span>
+                <span class="s">"INSERT INTO events (fields) VALUES (?)"</span><span class="p">,</span>
+                <span class="n">jsonData</span>
+            <span class="p">)</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+            <span class="kt">NSLog</span><span class="p">(</span><span class="s">"Could not save event to database: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Then during app startup</span>
+<span class="k">let</span> <span class="nv">dbConnection</span> <span class="o">=</span> <span class="o">...</span> <span class="c1">// create the database connection</span>
+<span class="kt">Event</span><span class="o">.</span><span class="n">sink</span> <span class="o">=</span> <span class="kt">DatabaseEventSink</span><span class="p">(</span><span class="nv">dbConnection</span><span class="p">:</span> <span class="n">dbConnection</span><span class="p">)</span>
+</code></pre>
+
+<p>Now all your events would end up in your database table.</p>
+
+<p>Note that event sinks do not have a way to report whether they&rsquo;ve failed or not. Application code that is sending events shouldn&rsquo;t need to worry about whether events are sending successfully. Instead, events should be fired and forgotten. If an event sink&rsquo;s implementation can fail, then responding to that should be internal to the implementation of the sink.</p>
+
+<p>Similarly, there is no way to asynchronously report completion of sending the event. Again, application code shouldn&rsquo;t need to worry about waiting for an event to finish sending. It&rsquo;s important that sending events is not disruptive to the flow of the application. So if your event sink needs to do asynchronous work, it should handle the details of that within its own implementation.</p>
 
           </div>
         </section>
@@ -210,7 +243,7 @@ default logging system for Apple&rsquo;s platforms.
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2019 <a class="link" href="https://www.mattmoriarity.com/" target="_blank" rel="external">Matt Moriarity</a>. All rights reserved. (Last updated: 2019-10-22)</p>
+      <p>&copy; 2019 <a class="link" href="https://www.mattmoriarity.com/" target="_blank" rel="external">Matt Moriarity</a>. All rights reserved. (Last updated: 2019-10-23)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>

@@ -34,7 +34,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 
-Doing this is highly recommended, as it can make it easier to filter logging to just your events.
+Doing this is highly recommended, as it makes it much easier to filter logging to just your events.
 
 `Event.sink` controls the default event sink that is assigned to new `EventBuilder`s. If you want to override it, be sure to set it before your first use of `Event.current`.
 
@@ -42,4 +42,39 @@ Doing this is highly recommended, as it can make it easier to filter logging to 
 
 If you don't want to send your events to the unified logging system, you can create a type that implements `EventSink` and send your events anywhere you want.
 
-An `Event` doesn't directly expose the data in its fields. Instead, events are designed to be encoded using Swift's `Encodable` protocol.
+An `Event` doesn't directly expose the data in its fields. Instead, events are designed to be encoded using Swift's `Encodable` protocol. This means that your event sink doesn't need to worry about how events are represented or how fields are stored. It can just let an encoder take care of serializing them and send that data where it needs to go.
+
+Hypothetically, if we wanted to make an event sink that saved each event as JSON in a row in a SQL database, that might look something like this:
+
+```swift
+class DatabaseEventSink {
+    let dbConnection: DBConnection
+    let encoder = JSONEncoder()
+
+    init(dbConnection: DBConnection) {
+        self.dbConnection = dbConnection
+    }
+
+    func send(event: Event, level: OSLogType) {
+        do {
+            let jsonData = try encoder.encode(event)
+            try dbConnection.execute(
+                "INSERT INTO events (fields) VALUES (?)",
+                jsonData
+            )
+        } catch {
+            NSLog("Could not save event to database: \(error)")
+        }
+    }
+}
+
+// Then during app startup
+let dbConnection = ... // create the database connection
+Event.sink = DatabaseEventSink(dbConnection: dbConnection)
+```
+
+Now all your events would end up in your database table.
+
+Note that event sinks do not have a way to report whether they've failed or not. Application code that is sending events shouldn't need to worry about whether events are sending successfully. Instead, events should be fired and forgotten. If an event sink's implementation can fail, then responding to that should be internal to the implementation of the sink.
+
+Similarly, there is no way to asynchronously report completion of sending the event. Again, application code shouldn't need to worry about waiting for an event to finish sending. It's important that sending events is not disruptive to the flow of the application. So if your event sink needs to do asynchronous work, it should handle the details of that within its own implementation.
