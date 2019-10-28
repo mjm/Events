@@ -16,7 +16,7 @@ public struct Event: Encodable {
     var error: Error?
     var message: StaticString = ""
     var fields: [Event.Key: AnyEncodable]
-    
+
     /// Encodes the data in the event to an `Encoder`.
     ///
     /// For encoders that care about the order of keys that are encoded, events encode fields in the following order:
@@ -33,7 +33,7 @@ public struct Event: Encodable {
             try container.encode(error.localizedDescription, forKey: .error)
         }
         try container.encode(message.asString, forKey: .message)
-        
+
         let sortedKeys = fields.keys.sorted { $0.stringValue < $1.stringValue }
         for key in sortedKeys {
             let value = fields[key]!

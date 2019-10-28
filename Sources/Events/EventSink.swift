@@ -1,6 +1,6 @@
 import Foundation
-import os
 import LogfmtEncoder
+import os
 
 /// An EventSink is responsible for sending events to a particular destination.
 ///
@@ -51,7 +51,7 @@ extension Event {
 public class OSLogEventSink: EventSink {
     let log: OSLog
     let encoder: LogfmtEncoder
-    
+
     /// Create a new `os_log` sink, optionally targeting a particular log.
     ///
     /// - Parameters:
@@ -60,7 +60,7 @@ public class OSLogEventSink: EventSink {
         self.log = log
         self.encoder = LogfmtEncoder()
     }
-    
+
     /// Create a new `os_log` sink for a particular subsystem and category.
     ///
     /// This is a shortcut, and is no different than using `init(log:)` and providing an `OSLog` with the given subsystem and category.
@@ -74,7 +74,7 @@ public class OSLogEventSink: EventSink {
     public convenience init(subsystem: String, category: String) {
         self.init(log: OSLog(subsystem: subsystem, category: category))
     }
-    
+
     public func send(event: Event, level: OSLogType) {
         do {
             let text = try encoder.encode(event)

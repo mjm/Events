@@ -26,13 +26,13 @@ public struct EventBuilder {
     /// multiple errors because it doesn't stop short in the case of an error. In this situation, it's fine to define custom event keys for each error
     /// and store both on the event.
     public var error: Error?
-    
+
     var fields: [Event.Key: AnyEncodable] = [:]
     var lazyFields: [Event.Key: () -> AnyEncodable] = [:]
     private var timers: [Event.Key: UInt64] = [:]
-    
+
     private let sink: EventSink
-    
+
     /// Create a new `EventBuilder`.
     ///
     /// Think carefully before constructing an `EventBuilder` directly. Most of the time, you'll want to use `Event.current` to avoid
@@ -46,7 +46,7 @@ public struct EventBuilder {
     public init(sink: EventSink = Event.sink) {
         self.sink = sink
     }
-    
+
     /// Get or set custom fields to include app-specific data in your events
     ///
     /// This is the primary way to include dynamic data in your events. You should define an `Event.Key` for each field you want to include,
@@ -58,7 +58,7 @@ public struct EventBuilder {
     ///    - key: The key of the data in the event.
     /// - Returns: The encodable value associated with the key in the event.
     ///
-    public subscript <T: Encodable>(_ key: Event.Key) -> T? {
+    public subscript<T: Encodable>(_ key: Event.Key) -> T? {
         get {
             fields[key] as? T
         }
@@ -66,7 +66,7 @@ public struct EventBuilder {
             fields[key] = AnyEncodable(newValue)
         }
     }
-    
+
     /// Set a custom field to a value that will be evaluated on-demand when the event is sent.
     ///
     /// This is very similar to normal field assignment, but instead of providing the value directly, you must provide a closure that returns the value
@@ -84,7 +84,7 @@ public struct EventBuilder {
     /// - Important: Due to the way on-demand fields are stored, it's not possible to get the closure that was originally set for the field back
     ///   out later. Attempting to do so will result in a `fatalError()`, because Swift requires a getter for all subscripts.
     ///
-    public subscript <T: Encodable>(_ key: Event.Key) -> () -> T {
+    public subscript<T: Encodable>(_ key: Event.Key) -> () -> T {
         get {
             fatalError("Lazy fields cannot be retrieved")
         }
@@ -92,7 +92,7 @@ public struct EventBuilder {
             lazyFields[key] = { AnyEncodable(newValue()) }
         }
     }
-    
+
     /// Starts a timer that will store a duration for a given key.
     ///
     /// It can be useful to track durations of specific parts of the work your app does during an event and store those durations as fields in the
@@ -107,12 +107,14 @@ public struct EventBuilder {
     /// - Precondition: There must not be a timer already started for this key.
     public mutating func startTimer(_ key: Event.Key) {
         guard timers[key] == nil else {
-            preconditionFailure("Attempted to start timer for key \(key), but there's already a timer going for that key.")
+            preconditionFailure(
+                "Attempted to start timer for key \(key), but there's already a timer going for that key."
+            )
         }
-        
+
         timers[key] = mach_absolute_time()
     }
-    
+
     /// Stops a timer that was previously started and records the duration in the event.
     ///
     /// The duration is stored as the milliseconds that passed between starting the timer and calling this method.
@@ -123,15 +125,15 @@ public struct EventBuilder {
     /// - Precondition: A timer must have been started for this key already.
     public mutating func stopTimer(_ key: Event.Key) {
         let endTime = mach_absolute_time()
-        
+
         guard let startTime = timers.removeValue(forKey: key) else {
             preconditionFailure("Attempted to stop timer for key \(key), but it was never started.")
         }
-        
+
         let nanos = (endTime - startTime) * UInt64(timeBase.numer) / UInt64(timeBase.denom)
-        self[key] = Double(nanos) / Double(NSEC_PER_MSEC) // store durations as milliseconds
+        self[key] = Double(nanos) / Double(NSEC_PER_MSEC)  // store durations as milliseconds
     }
-    
+
     /// Send the event to its sink using the default level.
     ///
     /// See `send(_:_:)` for more details on sending events.
@@ -141,7 +143,7 @@ public struct EventBuilder {
     public mutating func send(_ message: StaticString) {
         send(.default, message)
     }
-    
+
     /// Send the event to its sink at a given level.
     ///
     /// This creates an `Event` based on the current fields in this builder and the global builder, and sends it to the event sink.
@@ -159,23 +161,26 @@ public struct EventBuilder {
     public mutating func send(_ level: OSLogType, _ message: StaticString) {
         let event = makeEvent(message: message)
         sink.send(event: event, level: level)
-        
+
         // reset for the next event
         error = nil
         fields = [:]
         lazyFields = [:]
         timers = [:]
     }
-    
+
     mutating func makeEvent(message: StaticString, timestamp: Date = Date()) -> Event {
-        let fields = Event.global.resolvedFields.merging(self.resolvedFields) { globalValue, localValue in localValue }
-        
-        return Event(timestamp: timestamp,
-                     error: error,
-                     message: message,
-                     fields: fields)
+        let fields = Event.global.resolvedFields.merging(self.resolvedFields) {
+            globalValue, localValue in localValue
+        }
+
+        return Event(
+            timestamp: timestamp,
+            error: error,
+            message: message,
+            fields: fields)
     }
-    
+
     private var resolvedFields: [Event.Key: AnyEncodable] {
         fields.merging(lazyFields.mapValues { $0() }) { $1 }
     }
